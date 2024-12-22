@@ -32,6 +32,14 @@ I welcome contributions to enhance this project. Please follow these steps to co
 
 6. Open a Pull Request.
 
+## License
+
+This project is licensed under the MIT License. See the [LICENSE]() file for details
+
+## Acknowledgements
+
+I would like to extend my special thanks to the developers of Groq API and Llama models for their exceptional tools.
+
 ## Installation
 
 To install and run Kisan Mitra,
