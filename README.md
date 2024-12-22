@@ -11,6 +11,14 @@ Kisan Mitra is a comprehensive project aimed at assisting farmers in the horticu
 - **Integration with Groq API and Llama Models:** Incorporates cutting-edge technologies like Groq API and Llama models for superior functionality.
 - **Retrieval-Augmented Generation (RAG):** Implements RAG to enhance the quality and relevance of generated responses by retrieving relevant information from a large corpus of data.
 
+## User Features
+
+- **Weather Information:** provides real-time weather information by accessing the geolocation of the user.
+- **Harvest Calculator:** enables user to calculate the expected yield and revenue from the crop harvest.
+- **Market Prices:** User can check current market rates for crops in their nearby markets.
+- **AI Assistant:** Users can get answers about farming laws and practices and can have a real time conversation.
+- **Learn:** Farmers can learn best practices from agricultural tutorials there.
+
 ## Contributing
 
 I welcome contributions to enhance this project. Please follow these steps to contribute:
