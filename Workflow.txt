@@ -1,0 +1,207 @@
+Step 1: Setting Up the Python Microservice with FastAPI
+1.1 Install Python Dependencies
+To begin, make sure you have Python and the necessary libraries installed.
+
+pip install fastapi uvicorn langchain openai google-api-python-client transformers
+
+1.2 Create a Python File (app.py)
+In your Python project folder, create a file named app.py to define your FastAPI service.
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+from langchain.llms import HuggingFaceLLM
+from langchain.tools import GoogleSearchAPIWrapper
+from langchain.chains import RetrievalQA
+from langchain.agents import Tool, initialize_agent
+
+# Initialize FastAPI app
+app = FastAPI()
+
+# Load Llama 3.3 70B model using HuggingFace (Ensure model is available or path is correct)
+llama_model = HuggingFaceLLM(model_name="meta-llama/Llama-3.3-70b", device="cuda")  # Adjust if you're using a local model
+
+# Initialize the Google Search tool
+google_search = GoogleSearchAPIWrapper()
+
+# Define the tool
+tools = [
+    Tool(
+        name="GoogleSearch",
+        func=google_search.run,
+        description="Search the web for relevant information"
+    )
+]
+
+# Initialize LangChain agent for RAG
+agent = initialize_agent(tools, llama_model, agent_type="zero-shot-react-description", verbose=True)
+
+# Request body model
+class QueryRequest(BaseModel):
+    query: str
+
+# Endpoint to handle user queries
+@app.post("/ask")
+async def ask_question(request: QueryRequest):
+    user_query = request.query
+    result = agent.run(user_query)  # Use LangChain's agent for RAG processing
+    return {"response": result}
+
+Llama 3.3 70B Model: This code loads the model via HuggingFace (meta-llama/Llama-3.3-70b). If the model is hosted locally, you’ll need to specify its path.
+Google Search API: We use LangChain's GoogleSearchAPIWrapper to fetch relevant documents based on the user’s query.
+Agent Initialization: The agent combines the search and Llama model to process the queries and return a response.
+
+1.3 Run the FastAPI Server
+To run your FastAPI app, use Uvicorn:
+
+uvicorn app:app --reload
+
+This will start your FastAPI service at http://127.0.0.1:8000.
+
+Step 2: Connect Python API to TypeScript Project
+Now, we’ll make your TypeScript application communicate with the FastAPI service we’ve just created.
+
+2.1 Install Axios for HTTP Requests
+If you don’t have Axios installed, run:
+
+npm install axios
+
+This will allow you to send HTTP requests from your TypeScript app to the FastAPI backend.
+
+2.2 Create TypeScript Function to Call the Python API
+In your TypeScript project, create a file where you’ll handle user queries (e.g., chatbot.ts).
+
+import axios from 'axios';
+
+// Function to send a query to the Python API and get a response
+async function askPythonBot(query: string): Promise<string> {
+    try {
+        const response = await axios.post('http://127.0.0.1:8000/ask', {
+            query: query,
+        });
+
+        // Return the response from the Python model
+        return response.data.response;
+    } catch (error) {
+        console.error('Error calling Python API:', error);
+        return 'Sorry, I couldn’t get an answer at the moment.';
+    }
+}
+
+// Example usage in the chatbot flow
+async function handleUserQuery(userQuery: string) {
+    const botResponse = await askPythonBot(userQuery);
+    console.log('Bot Response:', botResponse);
+}
+
+// Simulate a query from a user
+handleUserQuery('What are the latest advancements in AI?');
+
+askPythonBot: Sends a POST request with the user’s query to the FastAPI service at http://127.0.0.1:8000/ask. It receives the processed response from the Python service and returns it to the user.
+handleUserQuery: This simulates handling a query in your chatbot. The response is logged or displayed in your UI, depending on your implementation.
+
+2.3 Integrate with TypeScript Chatbot Flow
+If you already have a chatbot framework (e.g., using Express.js), integrate the askPythonBot function into the route handling.
+
+import express from 'express';
+import axios from 'axios';
+
+const app = express();
+const port = 3000;
+
+app.use(express.json());
+
+app.post('/chat', async (req, res) => {
+    const userQuery = req.body.query;
+    const botResponse = await askPythonBot(userQuery);  // Send query to Python API
+    res.json({ response: botResponse });  // Return bot's response to the client
+});
+
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
+
+Step 3: Connecting File Paths and Configurations
+Model Path (Llama 3.3 70B):
+
+If you’re hosting Llama 3.3 70B locally, provide the file path for the model in the model_name parameter in the HuggingFaceLLM setup in your Python FastAPI service.
+Example for local models:
+
+llama_model = HuggingFaceLLM(model_name="/path/to/your/llama-3.3-70b", device="cuda")
+
+(DO NOT GET OVERWHELMED YOU WONT REQUIRE THIS MOST PROB IF YOU SUCCESSFULLY GET THE MODEL ON HUGGINGFACE)
+
+Google Search API Key:
+
+If you’re using Google Search API, ensure you have the API key configured properly. For GoogleSearchAPIWrapper, the API key and credentials must be set up.
+
+Example for configuring the search API in Python:
+
+from googleapiclient.discovery import build
+# Initialize Google Custom Search API with the API key
+api_key = "YOUR_GOOGLE_API_KEY"
+cx = "YOUR_CUSTOM_SEARCH_ENGINE_ID"
+google_search = build("customsearch", "v1", developerKey=api_key)
+
+(GET YOUR CREDS FROM OFFICIAL GOOGLE FOR DEVS SITE)
+
+||>> 1. Running the Python FastAPI Service on localhost
+After setting up the FastAPI service, you can run it directly on your local machine without Docker.
+
+Steps:
+Ensure FastAPI and Uvicorn are installed: If you haven’t already installed FastAPI and Uvicorn, do so by running:
+
+pip install fastapi uvicorn
+
+Run the FastAPI Service: Navigate to the directory where your app.py (Python service) is located and run it using Uvicorn:
+
+uvicorn app:app --reload
+
+This will start the server at http://127.0.0.1:8000 by default. The FastAPI service will now be running locally.
+
+2. Running the TypeScript Application on localhost
+Ensure your TypeScript dependencies are installed (like Axios if needed):
+
+npm install axios express
+
+Start your TypeScript server (or directly run your chatbot code): Assuming you are using Node.js (with Express.js or another framework), run the application with:
+
+npm run start
+
+This will start the TypeScript server (e.g., at http://localhost:3000).
+
+3. Communication Between the Two Services
+For communication between the TypeScript and Python services on localhost:
+
+Python FastAPI Service is running at http://127.0.0.1:8000/.
+TypeScript Service (Express) will run on a different port, e.g., http://localhost:3000/.
+When the user interacts with your TypeScript-based chatbot, it will call the Python API to get the response. Here’s how that communication works:
+
+The TypeScript server will send an HTTP POST request to http://127.0.0.1:8000/ask with the user's query.
+The FastAPI service will process the query using the Llama 3.3 70B model and return the response.
+The TypeScript server receives the response and sends it back to the user.
+
+4. Ensure Both Services Are Running
+For everything to work properly:
+
+FastAPI Service must be running on port 8000 (or whichever port you've chosen in the uvicorn command).
+TypeScript App (Express or other framework) must be running on its designated port, such as port 3000.
+If either service is down or not running on the expected port, the communication between them will fail.
+
+5. Testing the Local Setup
+Start the FastAPI Python service first (uvicorn app:app --reload).
+Then, start the TypeScript server.
+Test by sending a query from your TypeScript app and check the response.
+
+Just make sure that:
+
+The Python FastAPI server is running and accessible on http://127.0.0.1:8000/.
+
+The TypeScript application is running and making requests to the correct URL (http://127.0.0.1:8000/ask).
+
+Everything will work seamlessly as long as the services are properly connected.
+
+Can also refer these for partial understanding : (https://youtu.be/uxXxXaMpn4M?si=QleJ_I9wXjK1Qdio), 
+(https://github.com/Maharshi-24/Chat-Bot-groq-llama3-70b-8192).
+
+HAPPY HACKING KARLO!!!!!!!!!!!!
+(Jeet jao toh mentor ka naam mention mat karna..uhmm..uhmm).

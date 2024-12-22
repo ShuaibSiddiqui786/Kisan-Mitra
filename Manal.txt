@@ -1,0 +1,23 @@
+Task 1 : Implement the Chat Logic by using llama-3.3-70b-versatile model directly 
+replacing the Groq API(keep it for backup in the project or optimize the output 
+simultaneously using Augmentation) implement RAG with the help of langchain and Search API
+Refer to the Workflow.txt file to know how to implement this and work with your backend &
+python mates to achieve this.
+
+Task 2 : encapsulate the Groq logic server side(research on it or ask me if you want to),
+removing it from the client exposure by modifying chatService.ts
+(basically set dangerouslyAllBrowser property to false or simply remove it and remember 
+it will be a breaking change unless handled properly)
+
+Task 3 : update the .env with the API Keys for optional functionalities like weather etc the 
+services for which i have already implemented also check and ensure the right links to API's 
+as i have filled them on a simulation basis with the help of Copilot.
+
+ALso there is an issue with chatbot microphone icon's state(it's working opposite
+(Sigh..not a good frontend dev)) fix it if you can and another issue is with response read aloud
+for that i'll suggest some fix it's been broken due to some dependency issues.
+
+Once Done with all this notify me then you'd need to implement conversational functionality and
+image recognition & processing also enhancing the UI by adding images of crops and products of 
+horticulture to increase the degree of accessibility and can also implement accessibility features
+for disabled people.
